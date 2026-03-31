@@ -4,6 +4,9 @@ import torch
 from torch import nn
 import torch.optim as optim
 
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
 project_root = Path(__file__).resolve().parent.parent
 
 df1 = pd.read_csv(project_root / "data" / "processed" / "TSLA_features.csv")
@@ -28,5 +31,23 @@ def split_data(df):
 
     return X_train, y_train, X_test, y_test
 
-X_train, y_train, X1_test, y1_test = split_data(df1)
 
+
+
+def AI_model(df):
+
+    X_train, y_train, X_test, y_test = split_data(df)
+
+    model = RandomForestClassifier(n_estimators=100, random_state=40)
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+
+    
+
+    accuracy = accuracy_score(y_test, y_pred)
+    print("Accuracy:", accuracy * 100, "%")
+
+AI_model(df1)
+AI_model(df2)
+AI_model(df3)

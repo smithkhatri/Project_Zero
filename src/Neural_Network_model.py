@@ -31,10 +31,11 @@ def split_data(df):
 X_train, y_train, X1_test, y1_test = split_data(df1)
 
 
-# class NeuralNetwork(nn.Module):
-#     def __init__(self):
-#         super().__init__()
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
 
-#         self.layer1 = nn.Linear(9, 64)
-#         self.layer2 = nn.Linear(64, 32)
-#         self.layer3 = nn.Linear(32, 1)
+        self.layer1 = nn.Linear(9, 64)
+        self.layer2 = nn.Linear(64, 32)
+        self.layer3 = nn.Linear(32, 1)
+

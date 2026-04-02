@@ -12,6 +12,7 @@ df3 = pd.read_csv(project_root / "data" / "processed" / "NVDA_features.csv")
 
 
 def split_data(df):
+    
     X = df[["Close", "High", "Low", "Open", "Volume", "Return", "MA_5", "MA_20", "Volatility"]] #9 features
     y = df["Target"]
 
@@ -28,14 +29,33 @@ def split_data(df):
 
     return X_train, y_train, X_test, y_test
 
+
+# 9 features x last 10 days = 90 input features
+
+
+
+
+
+
+
+
+
 X_train, y_train, X1_test, y1_test = split_data(df1)
 
+print(X_train)
+print(y_train)
+print(X1_test)
+print(y1_test)
 
-class NeuralNetwork(nn.Module):
-    def __init__(self):
-        super().__init__()
 
-        self.layer1 = nn.Linear(9, 64)
-        self.layer2 = nn.Linear(64, 32)
-        self.layer3 = nn.Linear(32, 1)
+
+
+# class NeuralNetwork(nn.Module):
+#     def __init__(self):
+#         super().__init__()
+
+#         self.layer1 = nn.Linear(90, 900)
+#         self.layer2 = nn.Linear(900, 900)
+#         self.layer3 = nn.Linear(900, 900)
+#         self.layer4 = nn.Linear(900, 1)
 

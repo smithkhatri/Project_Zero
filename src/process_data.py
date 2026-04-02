@@ -18,8 +18,7 @@ def process_data(data):
     data["MA_20"] = data["Close"].rolling(window=20).mean()
     data["Volatility"] = data["Return"].rolling(window=5).std()
 
-    data["Future_Return"] = data["Return"].shift(-5) #return after 5 days
-    data["Target"] = (data["Future_Return"] > 0).astype(int) #after 5 days
+    data["Target"] = (data["Close"].shift(-5) > data["Close"]).astype(int) #target for price after 5days
 
     data = data.dropna()
     return data

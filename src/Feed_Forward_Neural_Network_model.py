@@ -4,6 +4,9 @@ import torch
 from torch import nn
 import torch.optim as optim
 
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
 project_root = Path(__file__).resolve().parent.parent
 
 df1 = pd.read_csv(project_root / "data" / "processed" / "TSLA_features.csv")
@@ -40,14 +43,22 @@ def split_data(df):
 
 
 
+
+
 X_train, y_train, X1_test, y1_test = split_data(df1)
 
-print(X_train)
-print(y_train)
-print(X1_test)
-print(y1_test)
+print(X_train.head())
+print(y_train.head())
+# print(X1_test.head())
+# print(y1_test.head())
 
 
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X1_test_scaled = scaler.transform(X1_test)
+
+print(X_train_scaled[:5])
+print(X1_test_scaled[:5])
 
 
 # class NeuralNetwork(nn.Module):

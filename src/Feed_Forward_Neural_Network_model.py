@@ -3,6 +3,7 @@ from pathlib import Path
 import torch
 from torch import nn
 import torch.optim as optim
+import numpy as np
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -35,38 +36,84 @@ def split_data(df):
 
 # 9 features x last 10 days = 90 input features
 
-
-
-
-
-
-
-
-
-
-
-X_train, y_train, X1_test, y1_test = split_data(df1)
-
-print(X_train.head())
-print(y_train.head())
-# print(X1_test.head())
-# print(y1_test.head())
-
+X_train, y_train, X_test, y_test = split_data(df1)
 
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
-X1_test_scaled = scaler.transform(X1_test)
-
-print(X_train_scaled[:5])
-print(X1_test_scaled[:5])
+X_test_scaled = scaler.transform(X_test)
 
 
-# class NeuralNetwork(nn.Module):
-#     def __init__(self):
-#         super().__init__()
 
-#         self.layer1 = nn.Linear(90, 900)
-#         self.layer2 = nn.Linear(900, 900)
-#         self.layer3 = nn.Linear(900, 900)
-#         self.layer4 = nn.Linear(900, 1)
+def create_10_day_window(arr):
+    r = []
+    for i in range(len(arr)- 9):
+        r.append(arr[i:i+10].flatten())
+    
+    return np.array(r)
 
+
+X_train_final = create_10_day_window(X_train_scaled)
+y_train_final = np.array(y_train[9:])
+
+X_test_final = create_10_day_window(X_test_scaled)
+y_test_final = np.array(y_test[9:])
+
+X = torch.tensor(X_train_final, dtype=torch.float32)
+y = torch.tensor(y_train_final, dtype=torch.float32).unsqueeze(1)
+
+
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.layer1 = nn.Linear(90, 900)
+        self.layer2 = nn.Linear(900, 900)
+        self.layer3 = nn.Linear(900, 900)
+        self.layer4 = nn.Linear(900, 1)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        x = self.relu(self.layer1(x))
+        x = self.relu(self.layer2(x))
+        x = self.relu(self.layer3(x))
+        x = self.layer4(x)
+        return x
+
+model = NeuralNetwork()
+
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+num_epochs = 100
+
+for epoch in range(500):
+    predictions = model(X)
+
+    loss = criterion(predictions, y) # THIS | BELOW THIS I DON"T GET THE INTUITION
+
+    optimizer.zero_grad() # THIS
+
+    loss.backward() # THIS
+    optimizer.step() # THIS | UNTIL HERE, I get it is loop and adjusting the weights but... how does it adjust the weights? What is the intuition behind this?
+                        # I don't see the model being adjusted, it's indirectly?
+
+    if epoch % 10 == 0:
+        print("Epoch:", epoch, "Loss:", loss.item())
+
+
+
+X = torch.tensor(X_test_final, dtype=torch.float32)
+y = torch.tensor(y_test_final, dtype=torch.float32).unsqueeze(1)
+
+
+
+model.eval()
+
+with torch.no_grad():
+    predictions = model(X)
+
+predictions = predictions.numpy()
+real_y = y.numpy()
+
+
+print("accuracy:", np.mean((predictions > 0.5) == (real_y > 0.5)))
